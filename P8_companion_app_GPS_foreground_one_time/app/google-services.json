@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "826884436845",
+    "firebase_url": "https://p8-companion.firebaseio.com",
+    "project_id": "p8-companion",
+    "storage_bucket": "p8-companion.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:826884436845:android:6d40a497740a432b7de064",
+        "android_client_info": {
+          "package_name": "com.google.android.gms.location.sample.locationupdatesforegroundservice"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "826884436845-9lv5l6qj7dtvph0rttpe477dhkbs4nd5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCrYUOKUv2VU3vhIhPnr_tkX29PtWfRZG0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "826884436845-9lv5l6qj7dtvph0rttpe477dhkbs4nd5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
