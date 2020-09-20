@@ -534,6 +534,7 @@ public class LocationUpdatesService extends Service {
                                     send("AT+HTTP=" + repose_formatted + "\r\n");
                                     Log.d(TAG, "LENGTH IS : " + ("AT+HTTP=" + text + "\r\n").length());
 
+
                                 }
                             }, new Response.ErrorListener() {
                         @Override

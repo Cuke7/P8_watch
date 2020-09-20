@@ -189,6 +189,8 @@ public class MainActivity extends AppCompatActivity implements
 
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
+
+
     }
 
     @Override
