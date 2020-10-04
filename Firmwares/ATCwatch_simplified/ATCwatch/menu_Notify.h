@@ -27,7 +27,7 @@ class NotifyScreen : public Screen
       set_gray_screen_style(&sans_regular);
 
       label_msg = lv_label_create(lv_scr_act(), NULL);
-      //lv_label_set_long_mode(label_msg, LV_LABEL_LONG_BREAK);
+      lv_label_set_long_mode(label_msg, LV_LABEL_LONG_BREAK);
       lv_obj_set_width(label_msg,240);
       //lv_obj_align(label_msg, NULL, LV_ALIGN_CENTER, 0, 20);
 

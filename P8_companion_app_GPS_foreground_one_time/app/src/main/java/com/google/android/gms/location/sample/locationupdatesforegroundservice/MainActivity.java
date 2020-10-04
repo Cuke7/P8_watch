@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements
     private MyReceiver myReceiver;
 
     // A reference to the service used to get location updates.
-    private LocationUpdatesService mService = null;
+    public LocationUpdatesService mService = null;
 
     // Tracks the bound state of the service.
     private boolean mBound = false;
@@ -83,6 +83,9 @@ public class MainActivity extends AppCompatActivity implements
     private Button mRemoveLocationUpdatesButton;
     private Button BLEWriteBtn;
     private Button BLEMeteoBtn;
+    private Button Lum1;
+    private Button Lum3;
+    private Button Lum7;
     private TextView mLastLocation;
 
     private TextView LogText;
@@ -146,6 +149,8 @@ public class MainActivity extends AppCompatActivity implements
                 connected = true;
                 //mNotificationManager.notify(12345678, getNotification(""));
                 log("P8 watch connected.");
+                //mService.sendMeteo();
+                //log("Meteo updated");
 
                 // Start the service if connected
                 mService.requestLocationUpdates();
@@ -189,8 +194,6 @@ public class MainActivity extends AppCompatActivity implements
 
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
-
-
     }
 
     @Override
@@ -204,6 +207,9 @@ public class MainActivity extends AppCompatActivity implements
         LogText = findViewById(R.id.LogText);
         BLEWriteBtn = findViewById(R.id.BLEWriteBtn);
         BLEMeteoBtn = findViewById(R.id.BLESetMeteo);
+        Lum1 = findViewById(R.id.Lum1);
+        Lum3 = findViewById(R.id.Lum3);
+        Lum7 = findViewById(R.id.Lum7);
 
 
         mRequestLocationUpdatesButton.setOnClickListener(new View.OnClickListener() {
@@ -224,10 +230,27 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
-        mRemoveLocationUpdatesButton.setOnClickListener(new View.OnClickListener() {
+        Lum1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mService.removeLocationUpdates();
+                mService.send("AT+CONTRAST=100\r\n");
+                log("Set luminosity to 1");
+            }
+        });
+
+        Lum3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mService.send("AT+CONTRAST=175\r\n");
+                log("Set luminosity to 3");
+            }
+        });
+
+        Lum7.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mService.send("AT+CONTRAST=300\r\n");
+                log("Set luminosity to 7");
             }
         });
 
