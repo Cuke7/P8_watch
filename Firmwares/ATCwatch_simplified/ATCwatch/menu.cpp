@@ -39,8 +39,8 @@ Screen_def *lastScreen = &homeScreen;
 
 app_struct rebootApp = {"Reboot", &Isymbolpower_icon, &rebootScreen};
 app_struct updateApp = {"Bootloader", &Isymbolbootloader_icon, &updateScreen};
-app_struct offApp = {"Shutdown", &IsymbolShutdown, &offScreen};
-app_struct tramApp = {"Geoloc app", &Isymboltram_icon , &tramScreen};
+app_struct offApp = {"Geoloc app", &IsymbolMaps, &tramScreen};
+app_struct tramApp = {"Tram info", &Isymboltram_icon , &offScreen};
 
 int maxApps = 4;
 

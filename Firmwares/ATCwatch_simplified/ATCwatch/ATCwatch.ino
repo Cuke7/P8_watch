@@ -53,7 +53,7 @@ void setup() {
   init_menu();
   init_push();
   init_flash();
-  init_accl();
+  //init_accl();
   init_ble();//must be before interrupts!!!
   init_interrupt();//must be after ble!!!
   delay(100);

@@ -505,70 +505,63 @@ public class LocationUpdatesService extends Service {
         sendBroadcast(intent);
 
         getGPS2();
-        if(mLocation == null){
-            Log.d(TAG, "GPS : mLocation = null");
-            mNotificationManager.notify(NOTIFICATION_ID, setNotification(new String(data) + ". No location available."));
-        }else{
-            String temp = new String(data);
-            if(temp.substring(0, 8).equals("AT+HTTP=")){
-                Log.d(TAG, "LOUIS HTTP");
+        String temp = new String(data);
+        String mLocationString = "44.816894, -0.585708";
+        if(temp.substring(0, 8).equals("AT+HTTP=")) {
 
-                if(temp.substring(8, data.length-2).equals("LOCATION")) {
-                    Log.d(TAG, "LOUIS LOCATION");
-                    //mNotificationManager.notify(NOTIFICATION_ID, setNotification(new String(data) + "at : "+ mLocation.getLongitude()+" ; " + mLocation.getLatitude()));
-                    Log.d(TAG, "GPS : " + mLocation.toString());
-                    String mLocationString = ""+mLocation.getLatitude()+", "+mLocation.getLongitude();
+            if (temp.substring(8, data.length - 2).equals("LOCATION")) {
 
-                    RequestQueue queue = Volley.newRequestQueue(this);
-                    String url ="https://mytrambot-bordeaux.herokuapp.com/get_station_time_for_P8_geoloc?coords=";
-
-                    // Request a string response from the provided URL.
-                    StringRequest stringRequest = (StringRequest) new StringRequest(Request.Method.GET, url+mLocationString,
-                            new Response.Listener<String>() {
-                                @Override
-                                public void onResponse(String response) {
-                                    Log.d(TAG,"RESPONSE : "+ response);
-                                    String repose_formatted = response.substring(0, response.length() - 1).replaceAll(";", "\n");
-                                    String text = DateFormat.getDateTimeInstance().format(new Date())+"\n" +"\n"+ repose_formatted;
-                                    mNotificationManager.notify(NOTIFICATION_ID, setNotification(text));
-                                    send("AT+HTTP=" + repose_formatted + "\r\n");
-                                    Log.d(TAG, "LENGTH IS : " + ("AT+HTTP=" + text + "\r\n").length());
-
-
-                                }
-                            }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.d(TAG, String.valueOf(error));
-                        }
-                    }).setRetryPolicy(new RetryPolicy() {
-                        @Override
-                        public int getCurrentTimeout() {
-                            return 15000;
-                        }
-                        @Override
-                        public int getCurrentRetryCount() {
-                            return 2;
-                        }
-                        @Override
-                        public void retry(VolleyError error) throws VolleyError {
-                        }
-                    });;
-
-                    // Add the request to the RequestQueue.
-                    queue.add(stringRequest);
+                if (mLocation != null) {
+                    mLocationString = "" + mLocation.getLatitude() + ", " + mLocation.getLongitude();
                 }
 
+                Log.d(TAG, "LOUIS LOCATION");
+                //mNotificationManager.notify(NOTIFICATION_ID, setNotification(new String(data) + "at : "+ mLocation.getLongitude()+" ; " + mLocation.getLatitude()));
+                //Log.d(TAG, "GPS : " + mLocation.toString());
 
-                if(temp.substring(8, data.length-2).equals("METEO")) {
-                    sendMeteo();
-                }
+                RequestQueue queue = Volley.newRequestQueue(this);
+                String url = "https://mytrambot-bordeaux.herokuapp.com/get_station_time_for_P8_geoloc?coords=";
 
+                // Request a string response from the provided URL.
+                StringRequest stringRequest = (StringRequest) new StringRequest(Request.Method.GET, url + mLocationString,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                Log.d(TAG, "RESPONSE : " + response);
+                                String repose_formatted = response.substring(0, response.length() - 1).replaceAll(";", "\n");
+                                String text = DateFormat.getDateTimeInstance().format(new Date()) + "\n" + "\n" + repose_formatted;
+                                mNotificationManager.notify(NOTIFICATION_ID, setNotification(text));
+                                send("AT+HTTP=" + repose_formatted + "\r\n");
+                                Log.d(TAG, "LENGTH IS : " + ("AT+HTTP=" + text + "\r\n").length());
+                            }
+                        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d(TAG, String.valueOf(error));
+                    }
+                }).setRetryPolicy(new RetryPolicy() {
+                    @Override
+                    public int getCurrentTimeout() {
+                        return 15000;
+                    }
+
+                    @Override
+                    public int getCurrentRetryCount() {
+                        return 2;
+                    }
+
+                    @Override
+                    public void retry(VolleyError error) throws VolleyError {
+                    }
+                });
+                // Add the request to the RequestQueue.
+                queue.add(stringRequest);
             }
 
 
-
-
+            if (temp.substring(8, data.length - 2).equals("METEO")) {
+                sendMeteo();
+            }
         }
     }
 

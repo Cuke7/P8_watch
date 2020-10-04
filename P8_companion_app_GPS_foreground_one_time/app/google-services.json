@@ -8,7 +8,7 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:826884436845:android:6d40a497740a432b7de064",
+        "mobilesdk_app_id": "1:826884436845:android:65a8bd39c385bebb7de064",
         "android_client_info": {
           "package_name": "com.google.android.gms.location.sample.locationupdatesforegroundservice"
         }
