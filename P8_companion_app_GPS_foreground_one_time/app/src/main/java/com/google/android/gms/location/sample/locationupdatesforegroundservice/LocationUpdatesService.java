@@ -31,10 +31,8 @@ import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.location.Location;
 import android.os.Binder;
@@ -46,7 +44,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -148,8 +145,6 @@ public class LocationUpdatesService extends Service {
         }
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
-        LocalBroadcastManager.getInstance(this).registerReceiver(onNotice, new IntentFilter("Msg"));
     }
 
     @Override
@@ -705,17 +700,4 @@ public class LocationUpdatesService extends Service {
                     }
                 });
     }
-    private BroadcastReceiver onNotice= new BroadcastReceiver() {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String pack = intent.getStringExtra("package");
-            String title = intent.getStringExtra("title");
-            String text = intent.getStringExtra("text");
-
-            Log.i(TAG, "NOTIF : " + title + "\n" + text);
-            send("AT+HTTP=" + title + "\n" + text + "\r\n");
-        }
-    };
-
 }

@@ -27,7 +27,7 @@ class NotifyScreen : public Screen
       set_gray_screen_style(&sans_regular);
 
       label_msg = lv_label_create(lv_scr_act(), NULL);
-      lv_label_set_long_mode(label_msg, LV_LABEL_LONG_BREAK);
+      //lv_label_set_long_mode(label_msg, LV_LABEL_LONG_BREAK);
       lv_obj_set_width(label_msg,240);
       //lv_obj_align(label_msg, NULL, LV_ALIGN_CENTER, 0, 20);
 
@@ -36,7 +36,6 @@ class NotifyScreen : public Screen
       style_station.text.font = &sans_bold28;
 
       label_station = lv_label_create(lv_scr_act(), NULL);
-      lv_label_set_long_mode(label_station, LV_LABEL_LONG_BREAK);
       lv_obj_set_style(label_station, &style_station );
       lv_obj_align(label_station, NULL, LV_ALIGN_CENTER, 0, -40);
 

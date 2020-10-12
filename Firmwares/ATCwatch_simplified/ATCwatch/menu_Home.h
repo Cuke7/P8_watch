@@ -165,7 +165,7 @@ public:
     arc = lv_arc_create(lv_scr_act(), NULL);
     lv_obj_set_size(arc, 165, 165);
     lv_arc_set_style(arc, LV_ARC_STYLE_MAIN, &arc_style);
-    lv_obj_align(arc, NULL, LV_ALIGN_CENTER, 0, -5);
+    lv_obj_align(arc, NULL, LV_ALIGN_CENTER, 0, 0);
 
     /*
     // Arc minutes
