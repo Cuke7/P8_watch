@@ -83,24 +83,20 @@ public class MainActivity extends AppCompatActivity implements
     private Button mRemoveLocationUpdatesButton;
     private Button BLEWriteBtn;
     private Button BLEMeteoBtn;
-    private TextView mLastLocation;
-
     private TextView LogText;
 
+    // Contain all logs to display
     public String logs ="";
 
+    // Use to display push notifications
     public NotificationManager mNotificationManager;
 
     private static final String CHANNEL_ID = "channel_01";
 
     // LBE stuff :
-    private TextView mConnectionState;
-    public TextView mDataField;
     private String mDeviceAddress  = "E3:7F:48:82:0E:1D";
-
     private final String LIST_NAME = "NAME";
     private final String LIST_UUID = "UUID";
-
     private boolean connected;
 
     // Monitors the state of the connection to the service.
@@ -114,13 +110,14 @@ public class MainActivity extends AppCompatActivity implements
 
             // LBE stuff :
             Log.d(TAG, "BLE : connected ?");
-            //mBluetoothLeService = ((LocationUpdatesService.LocalBinder) service).getService();
             if (!mService.initialize()) {
                 Log.e(TAG, "Unable to initialize Bluetooth");
                 finish();
             }
             // Automatically connects to the device upon successful start-up initialization
             mService.connect(mDeviceAddress);
+
+            // Try to get a location
             mService.getGPS2();
         }
 
