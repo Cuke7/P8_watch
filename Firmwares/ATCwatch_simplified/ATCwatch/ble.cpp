@@ -146,5 +146,6 @@ void filterCmd(String Command) {
     show_push(Command.substring(8));
   }else if (Command.substring(0, 9) == "AT+METEO=") {
     set_meteo(Command.substring(9));
+    ble_write("AT+METEO:" + Command.substring(9));
   }
 }

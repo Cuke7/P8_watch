@@ -31,4 +31,9 @@
     <string name="unknown_characteristic">Unknown characteristic</string>
     <string name="connected">connected</string>
     <string name="disconnected">disctonnected</string>
+    <string-array name="Luminosity">
+        <item>Low luminosity</item>
+        <item>Medium luminosity</item>
+        <item>High luminosity</item>
+    </string-array>
 </resources>

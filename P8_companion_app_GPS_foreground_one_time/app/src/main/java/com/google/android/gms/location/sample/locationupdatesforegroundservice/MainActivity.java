@@ -43,7 +43,10 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -84,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements
     private Button BLEWriteBtn;
     private Button BLEMeteoBtn;
     private TextView LogText;
+    private Spinner LuminositySpinner;
 
     // Contain all logs to display
     public String logs ="";
@@ -185,9 +189,6 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-
-
-
     }
 
     @Override
@@ -201,7 +202,38 @@ public class MainActivity extends AppCompatActivity implements
         LogText = findViewById(R.id.LogText);
         BLEWriteBtn = findViewById(R.id.BLEWriteBtn);
         BLEMeteoBtn = findViewById(R.id.BLESetMeteo);
+        LuminositySpinner = findViewById(R.id.spinner);
 
+        // Get les options du spinner dans strings.xml
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.Luminosity, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        LuminositySpinner.setAdapter(adapter);
+
+        LuminositySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                if(connected){
+                    switch(position) {
+                        case 0:
+                            mService.send("AT+CONTRAST=100\r\n");
+                            break;
+                        case 1:
+                            mService.send("AT+CONTRAST=175\r\n");
+                            break;
+                        case 2:
+                            mService.send("AT+CONTRAST=200\r\n");
+                            break;
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // your code here
+            }
+
+        });
 
         mRequestLocationUpdatesButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -294,18 +326,6 @@ public class MainActivity extends AppCompatActivity implements
         super.onStop();
 
     }
-
-    // BLE stuff :
-
-    /*private void updateConnectionState(final int resourceId) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mConnectionState.setText(resourceId);
-            }
-        });
-
-    }*/
 
     // Demonstrates how to iterate through the supported GATT Services/Characteristics.
     // In this sample, we populate the data structure that is bound to the ExpandableListView
@@ -518,7 +538,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private Handler mHandler;
-    private boolean mScanning;
     private BluetoothAdapter mBluetoothAdapter;
 
     private void scanLeDevice(final boolean enable) {
@@ -527,19 +546,15 @@ public class MainActivity extends AppCompatActivity implements
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    mScanning = false;
                     mBluetoothAdapter.stopLeScan(mLeScanCallback);
                     invalidateOptionsMenu();
                     Log.d(TAG, "BLE : STOP SCAN");
                     log("Stopped scanning.");
-                    mService.send("AT+CONTRAST=100\r\n");
                 }
             },5000);
 
-            mScanning = true;
             mBluetoothAdapter.startLeScan(mLeScanCallback);
         } else {
-            mScanning = false;
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
         }
         invalidateOptionsMenu();
@@ -548,14 +563,12 @@ public class MainActivity extends AppCompatActivity implements
     // Device scan callback.
     private BluetoothAdapter.LeScanCallback mLeScanCallback =
             new BluetoothAdapter.LeScanCallback() {
-
                 @Override
                 public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            //mLeDeviceListAdapter.addDevice(device);
-                            //mLeDeviceListAdapter.notifyDataSetChanged();
+                            // DO NOTHING ON LE SCAN CALLBACK
                         }
                     });
                 }

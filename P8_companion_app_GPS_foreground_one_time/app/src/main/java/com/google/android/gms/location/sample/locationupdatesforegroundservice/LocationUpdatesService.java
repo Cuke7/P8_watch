@@ -463,7 +463,7 @@ public class LocationUpdatesService extends Service {
 
     public void sendMeteo(){
         RequestQueue queue = Volley.newRequestQueue(this);
-        String url ="http://cuke.duckdns.org/weather";
+        String url ="https://mytrambot-bordeaux.herokuapp.com/weather";
 
         // Request a string response from the provided URL.
         StringRequest stringRequest = (StringRequest) new StringRequest(Request.Method.GET, url,
@@ -520,7 +520,7 @@ public class LocationUpdatesService extends Service {
                 //Log.d(TAG, "GPS : " + mLocation.toString());
 
                 RequestQueue queue = Volley.newRequestQueue(this);
-                String url = "http://cuke.duckdns.org/get_station_time_for_P8_geoloc?coords=";
+                String url = "https://mytrambot-bordeaux.herokuapp.com/get_station_time_for_P8_geoloc?coords=";
 
                 // Request a string response from the provided URL.
                 StringRequest stringRequest = (StringRequest) new StringRequest(Request.Method.GET, url + mLocationString,

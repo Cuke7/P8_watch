@@ -29,7 +29,7 @@
 
 long last_main_run;
 int vars_menu = -1;
-int vars_max_menu = 1;
+int vars_max_menu = 2;
 bool swipe_enabled_bool = false;
 
 Screen_def *currentScreen = &homeScreen;
@@ -39,15 +39,15 @@ Screen_def *lastScreen = &homeScreen;
 
 app_struct rebootApp = {"Reboot", &Isymbolpower_icon, &rebootScreen};
 app_struct updateApp = {"Bootloader", &Isymbolbootloader_icon, &updateScreen};
-app_struct offApp = {"Geoloc app", &IsymbolMaps, &tramScreen};
-app_struct tramApp = {"Tram info", &Isymboltram_icon , &offScreen};
+app_struct tramApp = {"Tram app", &Isymboltram_icon, &tramScreen};
+app_struct offApp = {"Tram info", &IsymbolMaps, &offScreen};
 
 int maxApps = 4;
 
-AppScreen apps2Screen(1, maxApps, &rebootApp, &updateApp, &offApp, &tramApp);
+AppScreen apps2Screen(1, maxApps, &rebootApp, &updateApp, &tramApp, &offApp);
 
 
-Screen_def *menus[4] = {&homeScreen, &apps2Screen};
+Screen_def *menus[3] = {&homeScreen, &apps2Screen, &notifyScreen};
 
 void init_menu() {
 
