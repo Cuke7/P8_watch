@@ -78,6 +78,9 @@ public class MainActivity extends AppCompatActivity implements
     // A reference to the service used to get location updates.
     private LocationUpdatesService mService = null;
 
+    // A reference to the notification class
+    private NotificationListener mNotificationListener = null;
+
     // Tracks the bound state of the service.
     private boolean mBound = false;
 
@@ -88,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements
     private Button BLEMeteoBtn;
     private TextView LogText;
     private Spinner LuminositySpinner;
+    private Button PermissionButton;
 
     // Contain all logs to display
     public String logs ="";
@@ -172,6 +176,7 @@ public class MainActivity extends AppCompatActivity implements
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         myReceiver = new MyReceiver();
         setContentView(R.layout.activity_main);
@@ -188,7 +193,7 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
 
-        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        //mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
     }
 
     @Override
@@ -203,6 +208,7 @@ public class MainActivity extends AppCompatActivity implements
         BLEWriteBtn = findViewById(R.id.BLEWriteBtn);
         BLEMeteoBtn = findViewById(R.id.BLESetMeteo);
         LuminositySpinner = findViewById(R.id.spinner);
+        PermissionButton = findViewById(R.id.PermissionButton);
 
         // Get les options du spinner dans strings.xml
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -269,6 +275,13 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
+        PermissionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getApplicationContext().startActivity(new Intent(       "android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+            }
+        });
+
         BLEMeteoBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -289,7 +302,21 @@ public class MainActivity extends AppCompatActivity implements
         //bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
         scanLeDevice(true);
         log("Scanning.");
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(MyReceiver, new IntentFilter(NotificationListener.ACTION_STATUS_BROADCAST));
+
     }
+
+    private BroadcastReceiver MyReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.i("MainActivity", "Broadcast Recieved: "+intent.getStringExtra("serviceMessage"));
+            String title = intent.getStringExtra("title");
+            String text = intent.getStringExtra("text");
+            //Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
+            mService.send("AT+HTTP="+title+"\n"+text+"\r\n");
+        }
+    };
 
     @Override
     protected void onResume() {
