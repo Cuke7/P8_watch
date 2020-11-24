@@ -216,44 +216,6 @@ public:
       style_battery.text.color = LV_COLOR_MAKE(0x05, 0xF9, 0x25);
     lv_obj_set_style(label_battery, &style_battery);
 
-    // Angle color calc :
-  
-    /*if (time_data.sec >= 0 && time_data.sec < 10)
-    {
-      r = 255;
-      g = ((time_data.sec - 0) / 9) * 255;
-      b = 0;
-    }
-    if (time_data.sec >= 10 && time_data.sec < 20)
-    {
-      r = 255 - ((time_data.sec - 10) / 9) * 255;
-      g = 255;
-      b = 0;
-    }
-    if (time_data.sec >= 20 && time_data.sec < 30)
-    {
-      r = 0;
-      g = 255;
-      b = ((time_data.sec - 20) / 9) * 255;
-    }
-    if (time_data.sec >= 30 && time_data.sec < 40)
-    {
-      r = 0;
-      g = 255 - ((time_data.sec - 30) / 9) * 255;
-      b = 255;
-    }
-    if (time_data.sec >= 40 && time_data.sec < 50)
-    {
-      r = ((time_data.sec - 40) / 9) * 255;
-      g = 0;
-      b = 255;
-    }
-    if (time_data.sec >= 50 && time_data.sec < 60)
-    {
-      r = 255;
-      g = 0;
-      b = 255 - ((time_data.sec - 50) / 9) * 255;
-    }*/
     arc_style.line.color = lv_color_hsv_to_rgb(time_data.sec * 6 , 100, 100);
     if(time_data.sec < 30){
       lv_arc_set_angles(arc, 180 - (time_data.sec * 360 / 60), 180);

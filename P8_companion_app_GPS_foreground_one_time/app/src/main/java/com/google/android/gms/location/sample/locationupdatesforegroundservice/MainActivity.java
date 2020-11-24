@@ -78,6 +78,9 @@ public class MainActivity extends AppCompatActivity implements
     // A reference to the service used to get location updates.
     private LocationUpdatesService mService = null;
 
+    // A reference to the notification class
+    private NotificationListener mNotificationListener = null;
+
     // Tracks the bound state of the service.
     private boolean mBound = false;
 
@@ -93,6 +96,9 @@ public class MainActivity extends AppCompatActivity implements
     // Contain all logs to display
     public String logs ="";
 
+    // Use to display push notifications
+    public NotificationManager mNotificationManager;
+
     private static final String CHANNEL_ID = "channel_01";
 
     // LBE stuff :
@@ -103,6 +109,7 @@ public class MainActivity extends AppCompatActivity implements
 
     // Monitors the state of the connection to the service.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
+
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             LocationUpdatesService.LocalBinder binder = (LocationUpdatesService.LocalBinder) service;
@@ -110,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements
             mBound = true;
 
             // LBE stuff :
+            Log.d(TAG, "BLE : connected ?");
             if (!mService.initialize()) {
                 Log.e(TAG, "Unable to initialize Bluetooth");
                 finish();
@@ -141,20 +149,26 @@ public class MainActivity extends AppCompatActivity implements
             final String action = intent.getAction();
             if (LocationUpdatesService.ACTION_GATT_CONNECTED.equals(action)) {
                 connected = true;
+                //mNotificationManager.notify(12345678, getNotification(""));
                 log("P8 watch connected.");
+
                 // Start the service if connected
                 mService.requestLocationUpdates();
             } else if (LocationUpdatesService.ACTION_GATT_DISCONNECTED.equals(action)) {
+                //mNotificationManager.notify(12345678, getNotification(""));
                 log("P8 watch disconnected.");
                 connected = false;
             } else if (LocationUpdatesService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                // Is maybe usefull (did not checked what it does)
+                // Show all the supported services and characteristics on the user interface.
                 displayGattServices(mService.getSupportedGattServices());
             } else if (LocationUpdatesService.ACTION_DATA_AVAILABLE.equals(action)) {
+
                 String data = intent.getStringExtra(LocationUpdatesService.EXTRA_DATA);
+
                 Log.d(TAG, "BLE received: " + data);
-                // Log the response from the watch in the app
                 log(data.substring(0,data.length()-1));
+
+                //mNotificationManager.notify(12345678, getNotification((CharSequence) data));
             }
         }
     };
@@ -167,7 +181,6 @@ public class MainActivity extends AppCompatActivity implements
         myReceiver = new MyReceiver();
         setContentView(R.layout.activity_main);
 
-        //Handler for the LBE scan callback
         mHandler = new Handler();
         final BluetoothManager bluetoothManager =
                 (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
@@ -179,6 +192,8 @@ public class MainActivity extends AppCompatActivity implements
                 requestPermissions();
             }
         }
+
+        //mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
     }
 
     @Override
@@ -336,6 +351,7 @@ public class MainActivity extends AppCompatActivity implements
         PreferenceManager.getDefaultSharedPreferences(this)
                 .unregisterOnSharedPreferenceChangeListener(this);
         super.onStop();
+
     }
 
     // Demonstrates how to iterate through the supported GATT Services/Characteristics.
@@ -396,6 +412,11 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    /*boolean status = mService.mBluetoothGatt.writeCharacteristic(gattCharacteristic);
+                    Log.d(TAG, "BLE write : " + status);*/
+
+    private BluetoothGattCharacteristic write_charac = null;
+
     private static IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(LocationUpdatesService.ACTION_GATT_CONNECTED);
@@ -414,6 +435,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void requestPermissions() {
+
         Log.i(TAG, "Requesting permission");
         // Request permission. It's possible this can be auto answered if device policy
         // sets the permission in a given state or the user denied the permission
@@ -480,7 +502,13 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {}
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        // Update the buttons state depending on whether location updates are being requested.
+        if (s.equals(Utils.KEY_REQUESTING_LOCATION_UPDATES)) {
+            setButtonsState(sharedPreferences.getBoolean(Utils.KEY_REQUESTING_LOCATION_UPDATES,
+                    false));
+        }
+    }
 
     private void setButtonsState(boolean requestingLocationUpdates) {
         if (requestingLocationUpdates) {
@@ -492,13 +520,48 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    public void showToast(final String toast) {
+    public void showToast(final String toast)
+    {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 Toast.makeText(MainActivity.this, toast, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private Notification getNotification(CharSequence text) {
+
+        String title = "";
+        if(connected){
+            title = "P8 connected";
+        }else{
+            title = "P8 is not connected";
+        }
+
+        PendingIntent activityPendingIntent = PendingIntent.getActivity(this, 0,
+                new Intent(this, MainActivity.class), 0);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                .setContentIntent(activityPendingIntent)
+                .setContentText(DateFormat.getDateTimeInstance().format(new Date()) + "\n" + text)
+                .setContentTitle(title)
+                .setOngoing(true)
+                .setPriority(Notification.PRIORITY_HIGH)
+                .setSmallIcon(R.drawable.ic_notification)
+                .setWhen(System.currentTimeMillis());
+
+        // Set the Channel ID for Android O.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            builder.setChannelId(CHANNEL_ID); // Channel ID
+        }
+
+        //PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        //@SuppressLint("InvalidWakeLockTag") PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "Tag");
+        //wakeLock.acquire();
+        //wakeLock.release();
+
+        return builder.build();
     }
 
     private Handler mHandler;

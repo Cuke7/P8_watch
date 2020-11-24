@@ -28,7 +28,7 @@ class NotifyScreen : public Screen
 
       label_msg = lv_label_create(lv_scr_act(), NULL);
       //lv_label_set_long_mode(label_msg, LV_LABEL_LONG_BREAK);
-      lv_obj_set_width(label_msg,240);
+      lv_obj_set_width(label_msg,220);
       //lv_obj_align(label_msg, NULL, LV_ALIGN_CENTER, 0, 20);
 
       lv_style_copy(&style_station, &lv_style_plain);
@@ -39,7 +39,7 @@ class NotifyScreen : public Screen
       lv_obj_set_style(label_station, &style_station );
       lv_obj_align(label_station, NULL, LV_ALIGN_CENTER, 0, -40);
       lv_label_set_long_mode(label_station, LV_LABEL_LONG_BREAK);
-      lv_obj_set_width(label_station,240);
+      lv_obj_set_width(label_station,220);
 
       String push_msg = get_push_msg();
       int IndexofNewLine = push_msg.indexOf('\n');
@@ -48,8 +48,8 @@ class NotifyScreen : public Screen
       
       lv_label_set_text_fmt(label_msg,"%s" ,string2char(message));
       lv_label_set_text_fmt(label_station,"%s" ,string2char(station));
-      lv_obj_align(label_station, NULL, LV_ALIGN_CENTER, 0, -40);
-      lv_obj_align(label_msg, NULL, LV_ALIGN_CENTER, 0, 20);
+      lv_obj_align(label_station, NULL, LV_ALIGN_CENTER, 0, -60);
+      lv_obj_align(label_msg, NULL, LV_ALIGN_CENTER, 0, 0);
 
     }
 
@@ -62,12 +62,12 @@ class NotifyScreen : public Screen
       
       lv_label_set_text_fmt(label_msg,"%s" ,string2char(message));
       lv_label_set_text_fmt(label_station,"%s" ,string2char(station));
-      lv_obj_align(label_station, NULL, LV_ALIGN_CENTER, 0, -40);
-      lv_obj_align(label_msg, NULL, LV_ALIGN_CENTER, 0, 20);
+      lv_obj_align(label_station, NULL, LV_ALIGN_CENTER, 0, -60);
+      lv_obj_align(label_msg, NULL, LV_ALIGN_CENTER, 0, 0);
       lv_label_set_long_mode(label_msg, LV_LABEL_LONG_BREAK);
-      lv_obj_set_width(label_msg,240);
+      lv_obj_set_width(label_msg,220);
       lv_label_set_long_mode(label_station, LV_LABEL_LONG_BREAK);
-      lv_obj_set_width(label_station,240);
+      lv_obj_set_width(label_station,220);
     }
 
     virtual void long_click()
@@ -87,11 +87,11 @@ class NotifyScreen : public Screen
 
     virtual void up()
     {
-      display_home();
+      inc_vars_menu();
     }
     virtual void down()
     {
-      display_home();
+      dec_vars_menu();
     }
 
     virtual void click(touch_data_struct touch_data)

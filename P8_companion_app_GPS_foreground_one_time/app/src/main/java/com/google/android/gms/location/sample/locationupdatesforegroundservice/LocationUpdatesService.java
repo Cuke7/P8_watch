@@ -557,8 +557,7 @@ public class LocationUpdatesService extends Service {
                 // Add the request to the RequestQueue.
                 queue.add(stringRequest);
             }
-
-
+            
             if (temp.substring(8, data.length - 2).equals("METEO")) {
                 sendMeteo();
             }
