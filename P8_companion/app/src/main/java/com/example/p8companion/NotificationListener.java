@@ -16,21 +16,11 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG,"SERVICE STARTED !");
-
+        Log.d(TAG,"Notification service started");
         super.onStartCommand(intent, flags, startId);
-
-        // NOTE: We return STICKY to prevent the automatic service termination
         return START_STICKY;
     }
 
-
-   /* private void broadcastStatus() {
-        Intent i1 = new  Intent(ACTION_STATUS_BROADCAST);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(i1);
-        sendBroadcast(i1);
-
-    }*/
 
     @Override
     public IBinder onBind(Intent intent) {

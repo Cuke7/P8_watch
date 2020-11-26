@@ -30,9 +30,12 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ForegroundService extends Service {
 
@@ -46,6 +49,10 @@ public class ForegroundService extends Service {
     public final static String ACTION_GATT_SERVICES_DISCOVERED = "com.example.bluetooth.le.ACTION_GATT_SERVICES_DISCOVERED";
     public final static String ACTION_DATA_AVAILABLE = "com.example.bluetooth.le.ACTION_DATA_AVAILABLE";
     public final static String EXTRA_DATA = "com.example.bluetooth.le.EXTRA_DATA";
+    public boolean mConnected = false;
+    public BluetoothGattCharacteristic write_chara= null;
+    private volatile boolean isWriting;
+    private Queue<String> sendQueue;
 
     //public final static UUID UUID_HEART_RATE_MEASUREMENT = UUID.fromString("00000002-0000-1000-8000-00805f9b34fb");
 
@@ -76,7 +83,19 @@ public class ForegroundService extends Service {
                 .setContentIntent(pendingIntent)
                 .build();
         startForeground(1, notification);
+
+        // Used for sending data to the watch
+        sendQueue = new ConcurrentLinkedQueue<String>();
+
         return START_STICKY;
+    }
+
+    public void customStartService() {
+        startService(new Intent(getApplicationContext(), ForegroundService.class));
+    }
+
+    public void customStopService() {
+        stopSelf();
     }
 
     // Returned an instance of the service to MainActivity when successfully bound
@@ -110,9 +129,27 @@ public class ForegroundService extends Service {
         return mBinder;
     }
 
+    @Override
+    public void onRebind(Intent intent) {
+        // Called when a client (MainActivity in case of this sample) returns to the foreground
+        // and binds once again with this service. The service should cease to be a foreground
+        // service when that happens.
+        Log.i(TAG, "in onRebind()");
+        //stopForeground(true);
+        //mChangingConfiguration = false;
+        super.onRebind(intent);
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        Log.i(TAG, "Last client unbound from service");
+        return true; // Ensures onRebind() is called when a client re-binds.
+    }
+
     //Bluetooth stuff
 
     public boolean initializeBLE() {
+        // For API level 18 and above, get a reference to BluetoothAdapter through
         // For API level 18 and above, get a reference to BluetoothAdapter through
         // BluetoothManager.
         if (mBluetoothManager == null) {
@@ -212,8 +249,8 @@ public class ForegroundService extends Service {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 Log.d("TAG","onCharacteristicWrite(): Successful");
             }
-            //isWriting = false;
-            //_send();
+            isWriting = false;
+            _send();
         }
     };
 
@@ -225,7 +262,6 @@ public class ForegroundService extends Service {
     private void broadcastUpdate(final String action, final BluetoothGattCharacteristic characteristic) {
         final Intent intent = new Intent(action);
         final byte[] data = characteristic.getValue();
-        Log.d(TAG, "Hello there");
         if (data != null && data.length > 0) {
             final StringBuilder stringBuilder = new StringBuilder(data.length);
             for (byte byteChar : data)
@@ -247,7 +283,6 @@ public class ForegroundService extends Service {
             for (BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
                 String uuid = gattCharacteristic.getUuid().toString();
 
-                // TEST LOUIS
                 if(uuid.equals("00000002-0000-1000-8000-00805f9b34fb")){
                     mBluetoothGatt.setCharacteristicNotification(gattCharacteristic, true);
 
@@ -259,12 +294,31 @@ public class ForegroundService extends Service {
                     Log.d(TAG, "Bluetooth : setCharacteristicNotification successful");
                 }
 
-                // TEST LOUIS
                 if(uuid.equals("00000001-0000-1000-8000-00805f9b34fb")){
-                    //mService.write_chara = gattCharacteristic;
+                    write_chara = gattCharacteristic;
                 }
-
             }
         }
+    }
+
+    public void send(String data) {
+        while (data.length()>18) {
+            sendQueue.add(data.substring(0,18));
+            data=data.substring(18);
+        }
+        sendQueue.add(data);
+        if (!isWriting) _send();
+    }
+
+    private boolean _send() {
+        if (sendQueue.isEmpty()) {
+            Log.d("TAG", "_send(): EMPTY QUEUE");
+            return false;
+        }
+        Log.d(TAG, "_send(): Sending: "+sendQueue.peek());
+        write_chara.setValue(sendQueue.poll().getBytes(Charset.forName("UTF-8")));
+        isWriting = true; // Set the write in progress flag
+        mBluetoothGatt.writeCharacteristic(write_chara);
+        return true;
     }
 }

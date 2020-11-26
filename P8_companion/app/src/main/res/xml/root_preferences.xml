@@ -1,0 +1,13 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="Notifications">
+
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:key="notification_switch"
+            app:title="Show notifications on the watch" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

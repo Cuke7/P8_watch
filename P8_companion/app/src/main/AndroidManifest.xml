@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.p8companion">
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -18,15 +19,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.P8Companion">
-        <service
-            android:name=".NotificationListener"
-            android:enabled="true"
-            android:exported="true"></service>
-        <service
-            android:name=".ForegroundService"
-            android:enabled="true"
-            android:exported="true"
-            android:foregroundServiceType="location" />
 
         <activity android:name=".MainActivity">
             <intent-filter>
@@ -35,6 +27,31 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"
+            tools:ignore="ExtraText">
+            android:parentActivityName=".MainActivity">
+            <!-- The meta-data tag is required if you support API level 15 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+
+        <service
+            android:name=".NotificationListener"
+            android:label="Notification service"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".ForegroundService"
+            android:enabled="true"
+            android:exported="true"
+            android:foregroundServiceType="location" />
     </application>
 
 </manifest>
