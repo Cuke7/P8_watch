@@ -27,11 +27,17 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -41,8 +47,9 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
 
     // UI elements
-    private Button mStopServiceButton, mSettingsButton;
+    private Button mStopServiceButton, mSettingsButton, mSetTimeButton, mSetMeteoButton;
     private TextView LogText;
+    private Spinner LuminositySpinner;
 
     // Contain all logs to display
     private String logs ="Logs : ";
@@ -52,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
 
     // Tracks the bound state of the service.
     private boolean mBound = false;
+
+    private boolean test = false;
 
     // Display or not on the watch the notifications received
     private boolean DisplayNotification = false;
@@ -92,6 +101,9 @@ public class MainActivity extends AppCompatActivity {
 
         mStopServiceButton = findViewById(R.id.StopServiceButton);
         mSettingsButton = findViewById(R.id.SettingsButton);
+        mSetTimeButton = findViewById(R.id.SetTimeButton);
+        mSetMeteoButton = findViewById(R.id.SetMeteoButton);
+        LuminositySpinner = findViewById(R.id.LuminostitySpinner);
         // Text view we'll use as log
         LogText = findViewById(R.id.LogText);
 
@@ -100,6 +112,48 @@ public class MainActivity extends AppCompatActivity {
         mSettingsButton.setOnClickListener(view -> {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
+        });
+
+        mSetTimeButton.setOnClickListener(view -> {
+            DateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
+            String now = df.format(new Date());
+            mService.send("AT+DT=" + now + "\r\n");
+        });
+
+        mSetMeteoButton.setOnClickListener(view -> {
+            mService.sendMeteo();
+        });
+
+        // Get les options du spinner dans strings.xml
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.Luminosity, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        LuminositySpinner.setAdapter(adapter);
+
+        LuminositySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                if(mBound){
+                    if(test){
+                        switch(position) {
+                            case 0:
+                                mService.send("AT+CONTRAST=100\r\n");
+                                break;
+                            case 1:
+                                mService.send("AT+CONTRAST=175\r\n");
+                                break;
+                            case 2:
+                                mService.send("AT+CONTRAST=200\r\n");
+                                break;
+                        }
+                    }
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // your code here
+            }
+
         });
 
         // Setup the broadcast used to receive the notifications
@@ -145,7 +199,8 @@ public class MainActivity extends AppCompatActivity {
                 android.Manifest.permission.ACCESS_FINE_LOCATION,
                 android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 android.Manifest.permission.BLUETOOTH,
-                android.Manifest.permission.BLUETOOTH_ADMIN
+                android.Manifest.permission.BLUETOOTH_ADMIN,
+                android.Manifest.permission.INTERNET
         };
         ActivityCompat.requestPermissions(this, PERMISSIONS, REQUEST_PERMISSIONS_REQUEST_CODE);
     }
@@ -166,6 +221,7 @@ public class MainActivity extends AppCompatActivity {
                 mService.mConnected = true;
                 log("P8 watch connected !");
                 mService.customStartService();
+                test = true;
             } else if (ForegroundService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 Log.d(TAG,"Bluetooth disconnected !");
                 mService.mConnected = false;

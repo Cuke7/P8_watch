@@ -30,6 +30,13 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -79,7 +86,7 @@ public class ForegroundService extends Service {
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Foreground Service")
                 .setContentText(input)
-                .setSmallIcon(R.drawable.ic_launcher_background)
+                .setSmallIcon(R.drawable.ic_notification)
                 .setContentIntent(pendingIntent)
                 .build();
         startForeground(1, notification);
@@ -301,6 +308,7 @@ public class ForegroundService extends Service {
         }
     }
 
+    // send() and _send() are used to send Bluetooth command to the watch
     public void send(String data) {
         while (data.length()>18) {
             sendQueue.add(data.substring(0,18));
@@ -320,5 +328,18 @@ public class ForegroundService extends Service {
         isWriting = true; // Set the write in progress flag
         mBluetoothGatt.writeCharacteristic(write_chara);
         return true;
+    }
+
+    public void sendMeteo(){
+        RequestQueue queue = Volley.newRequestQueue(this);
+        String url ="https://mytrambot-bordeaux.herokuapp.com/weather";
+
+        // Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                response -> {
+                    send("AT+METEO=" + response + "\r\n");
+                    //send("AT+METEO=" + "20° clear sky;50d" + "\r\n");
+                }, error -> Log.d(TAG, String.valueOf(error)));
+        queue.add(stringRequest);
     }
 }

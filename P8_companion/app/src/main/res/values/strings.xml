@@ -19,4 +19,10 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
+
+    <string-array name="Luminosity">
+        <item>Low luminosity</item>
+        <item>Medium luminosity</item>
+        <item>High luminosity</item>
+    </string-array>
 </resources>
